@@ -111,7 +111,7 @@ const restaurantController = {
           ...restaurant.toJSON(),
           favoritedCount: restaurant.FavoritedUsers.length,
           isFavorited: req.user && req.user.FavoritedRestaurants.some(r => r.id === restaurant.id)
-        })).sort((a, b) => b.favoritedCount - a.favoritedCount)
+        })).sort((a, b) => b.favoritedCount - a.favoritedCount).slice(0, 10)
         return res.render('top-restaurants', { restaurants: data })
       })
       .catch(err => next(err))
