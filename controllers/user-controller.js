@@ -40,7 +40,12 @@ const userController = {
   },
   getUser: (req, res, next) => {
     return User.findByPk(req.params.id, {
-      include: { model: Comment, include: Restaurant }
+      include: [
+        { model: Comment, include: Restaurant },
+        { model: Restaurant, as: 'FavoritedRestaurants' },
+        { model: User, as: 'Followings' },
+        { model: User, as: 'Followers' }
+      ]
     })
       .then(user => {
         if (!user) throw new Error("User didn't exist!")
@@ -52,14 +57,14 @@ const userController = {
     return User.findByPk(req.params.id, { raw: true })
       .then(user => {
         if (!user) throw new Error("User didn't exist!")
-        // assert.equal(user.id, req.user.id, "User can't modify others profile")
+        assert.equal(user.id, req.user.id, "User can't modify others profile")
         return res.render('users/edit', { user })
       })
       .catch(err => next(err))
   },
   putUser: (req, res, next) => {
     const { name } = req.body
-    if (!name) throw new Error('Restaurant name is required!')
+    if (!name) throw new Error('User name is required!')
     const { id } = req.params
     const { file } = req
     return Promise.all([
