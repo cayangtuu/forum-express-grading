@@ -1,7 +1,7 @@
 const path = require('path')
 const express = require('express')
 const exphbs = require('express-handlebars')
-const pages = require('./routes/pages')
+const { pages, apis } = require('./routes')
 const flash = require('connect-flash')
 const methodOverride = require('method-override')
 const session = require('express-session')
@@ -33,6 +33,7 @@ app.use((req, res, next) => {
   next()
 })
 
+app.use('/api', apis)
 app.use(pages)
 
 app.listen(port, () => {
