@@ -1,5 +1,6 @@
 const { Restaurant, Category } = require('../models')
-const adminController = {
+const { imgurFileHandler } = require('../helpers/file-helpers')
+const adminServices = {
   getRestaurants: (req, cb) => {
     return Restaurant.findAll({
       raw: true,
@@ -7,6 +8,26 @@ const adminController = {
       include: [Category]
     })
       .then(restaurants => cb(null, { restaurants }))
+      .catch(err => cb(err))
+  },
+  postRestaurant: (req, cb) => {
+    const { name, tel, address, openingHours, description, categoryId } = req.body
+    if (!name) throw new Error('Restaurant name is required!')
+    const { file } = req
+    return imgurFileHandler(file)
+      .then(filePath =>
+        Restaurant.create({
+          name,
+          tel,
+          address,
+          openingHours,
+          description,
+          image: filePath || null,
+          categoryId
+        }))
+      .then(newRestaurant => {
+        return cb(null, { restaurant: newRestaurant })
+      })
       .catch(err => cb(err))
   },
   deleteRestaurant: (req, cb) => {
@@ -23,4 +44,4 @@ const adminController = {
       .catch(err => cb(err))
   }
 }
-module.exports = adminController
+module.exports = adminServices
